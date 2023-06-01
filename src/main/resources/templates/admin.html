@@ -168,8 +168,8 @@
                                         </div>
                                         <p>
                                             <label class="form-label fw-bold">Role</label>
-                                            <select id="newUserRoles" class="form-select col-md-5"
-                                                    name="roles" multiple="" size="2" required>
+                                            <label for="newUserRoles"></label><select id="newUserRoles" class="form-select col-md-5"
+                                                                                      name="roles" multiple="" size="2" required>
                                                 <option value="2">ADMIN</option>
                                                 <option value="1">USER</option>
                                             </select>
@@ -268,8 +268,8 @@
                                    required/>
                         </div>
                         <label class="form-label fw-bold">Role</label>
-                        <select id="editModalRoles" class="form-select col-md-5"
-                                name="roles" multiple size="2" required>
+                        <label for="editModalRoles"></label><select id="editModalRoles" class="form-select col-md-5"
+                                                                    name="roles" multiple size="2" required>
                             <option value="2">ADMIN</option>
                             <option value="1">USER</option>
                         </select>
@@ -359,8 +359,8 @@
                                    id="deleteModalEmail" readonly/>
                         </div>
                         <label class="form-label fw-bold">Role</label>
-                        <input type="text" name="roles"
-                               class="form-control" id="deleteModalRoles" readonly/>
+                        <label for="deleteModalRoles"></label><input type="text" name="roles"
+                                                                     class="form-control" id="deleteModalRoles" readonly/>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" id="deleteModalCloseButton"
                                     data-bs-dismiss="modal">Close
