@@ -26,7 +26,6 @@ public class LoadUser {
     @PostConstruct
     public void load() {
 
-
         Role roleAdmin = new Role( "ROLE_ADMIN");
         Role roleUser = new Role( "ROLE_USER");
         Set<Role> adminSet = new HashSet<>();
@@ -37,20 +36,19 @@ public class LoadUser {
 
         adminSet.add(roleAdmin);
         adminSet.add(roleUser);
-        userSet.add(roleUser);
+         userSet.add(roleUser);
 
 
         User admin = new User("Boris", "Borisov", 25, "email@ru.ru","BorisKata",
                 "100", adminSet);
 
         User user = new User("Ivan", "Ivanov", 20, "email2@ru.ru", "IvanKata",
-                "50", userSet);
+                "500", userSet);
 
 
 
         userService.saveUser(admin);
-        userService.saveUser(user);
-
+        userService.saveUser(user);//
 
 
 

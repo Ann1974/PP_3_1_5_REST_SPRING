@@ -1,9 +1,11 @@
 package ru.kata.spring.boot_security.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.Set;
 
@@ -15,27 +17,28 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
-    @Column(name = "name")
+    @NotEmpty(message = "Заполните поле")
+    @Column(name = "name", nullable = false, length = 45)//
     private String name;
 
-    @Column(name = "lastName")
+    @Column(name = "lastName", nullable = false, length = 45)
     private String lastName;
 
-    @Column(name = "age")
+    @Column(name = "age", nullable = false, length = 45)
     private Integer age;
 
-    @Column(name = "email")
+
+    @Column(name = "email", nullable = false, length = 45)
     private String email;
 
-    @Column(name = "login")
+    @Column(name = "login", nullable = false, unique = true, length = 45)
     private String login;
 
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn (name = "user_id"), inverseJoinColumns = @JoinColumn (name = "role_id"))
     private Set<Role> roles;
 
@@ -119,7 +122,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        return getRoles();
     }
 
     public String getPassword() {

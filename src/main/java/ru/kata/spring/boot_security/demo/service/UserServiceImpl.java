@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kata.spring.boot_security.demo.dao.UserDao;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
 import java.util.List;
 
@@ -16,105 +16,61 @@ import java.util.List;
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userDao;
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passEncoder;
 
-
-   @Autowired
-    public UserServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder) {
-        this.userDao = userDao;
-        this.passwordEncoder = passwordEncoder;
-
-   }
-
-    private User encryptUserPassword(User user){
-       user.setPassword(passwordEncoder.encode(user.getPassword()));
-       return user;
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passEncoder) {
+        this.userRepository = userRepository;
+        this.passEncoder = passEncoder;
     }
 
-
-    /*
-     3.1.4 - обновлён метод saveUser
-     */
-@Override
-@Transactional
-public void saveUser(User user) {
-    if(user.getPassword() == null || user.getPassword().isEmpty()) {
-        throw new IllegalArgumentException("Пароль не может быть пустым");
+    private User encryptPassword(User user) {
+        user.setPassword(passEncoder.encode(user.getPassword()));
+        return user;
     }
-    String encodedPassword = passwordEncoder.encode(user.getPassword());
-    user.setPassword(encodedPassword);
-    userDao.saveUser(user);
-}
 
     @Override
     @Transactional
-    public void updateUser(User updateUser) {
-    userDao.updateUser(encryptUserPassword(updateUser));
+    public void saveUser(User user) {
+        userRepository.save(encryptPassword(user));
     }
 
-
-
-
-//    @Override
-//    @Transactional
-//    public void updateUser(User updateUser) {
-//        userDao.updateUser(updateUser);
-//
-//    }
-
-/*  под вопросом  метод updateUser
-
-
-    @Override
-    @Transactional
-    public void updateUser(User updateUser) {
-        if(updateUser.getPassword() == null || updateUser.getPassword().isEmpty()) {
-            User existingUser = userDao.getUserById(updateUser.getId());
-            updateUser.setPassword(existingUser.getPassword());
-        } else {
-            updateUser.setPassword(passwordEncoder.encode(updateUser.getPassword()));
-        }
-        userDao.updateUser(updateUser);
-    }
- */
     @Override
     @Transactional
     public void removeUserById(Long id) {
-        userDao.removeUserById(id);
-
+        userRepository.deleteById(id);
     }
 
+
     @Override
+    @Transactional
     public List<User> getAllUsers() {
-        List<User> users = userDao.getAllUsers();
-        for (User user : users) {
-            Hibernate.initialize(user.getRoles());
-        }
+        List<User> users = userRepository.findAll();
+        users.forEach(user -> Hibernate.initialize(user.getRoles()));
         return users;
     }
 
     @Override
     public User getUserById(Long id) {
-        return userDao.getUserById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        Hibernate.initialize(user.getRoles());
+        return user;
     }
-
 
     @Override
     public User getUserByLogin(String login) {
-        return userDao.findByLogin(login);
+        return userRepository.getUserByLogin(login);
     }
-
-
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        User user = userDao.findByLogin(login);
-        System.out.println(user);
-        if (user == null)
-            throw new UsernameNotFoundException("Пользователь не найден");
+        User user = getUserByLogin(login);
+        if (user == null) {
+            throw new UsernameNotFoundException(String.format("Пользователь  не существует", login));
+        }
         return user;
     }
-
 }
